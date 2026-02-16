@@ -5,6 +5,7 @@ import { create } from 'zustand';
 import { chatCompletionStream, getSiliconFlowConfig } from '@/services/siliconflow';
 import type { ChatMessage } from '@/services/siliconflow';
 import { buildTeacherPromptPrefix, getTeacherProfile } from '@/utils/teacherPromptBuilder';
+import { detectSkillFromConversation } from '@/utils/skillLoader';
 
 export interface Message {
   id: string;
@@ -164,7 +165,17 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     // Build messages for API
     const profile = getTeacherProfile();
-    const systemPrompt = buildTeacherPromptPrefix(profile);
+    let systemPrompt = buildTeacherPromptPrefix(profile);
+
+    // Detect if a skill should be activated based on conversation content
+    const allMessages = updatedConv.messages
+      .filter((m) => m.role !== 'system')
+      .map((m) => ({ role: m.role, content: m.content }));
+    const skillInjection = detectSkillFromConversation(allMessages);
+    if (skillInjection) {
+      systemPrompt += '\n' + skillInjection;
+    }
+
     const apiMessages: ChatMessage[] = [
       { role: 'system', content: systemPrompt },
       ...updatedConv.messages

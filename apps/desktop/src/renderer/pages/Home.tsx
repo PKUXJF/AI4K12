@@ -40,9 +40,9 @@ const EDU_USE_CASES = [
   },
   {
     icon: '✍️',
-    title: '作业布置',
-    description: '分层布置课后练习',
-    prompt: '帮我布置一下课后作业',
+    title: '教学论文',
+    description: 'AI辅助论文选题、提纲、撰写',
+    prompt: '我想写一篇教学论文',
   },
   {
     icon: '💡',
