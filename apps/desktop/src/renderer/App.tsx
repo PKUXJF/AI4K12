@@ -1,23 +1,17 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { isRunningInElectron, getAccomplish } from './lib/accomplish';
 import { springs, variants } from './lib/animations';
-import type { ProviderId } from '@accomplish_ai/agent-core/common';
 
 // Pages
 import HomePage from './pages/Home';
-import ExecutionPage from './pages/Execution';
 import ChatPage from './pages/Chat';
 
 // Components
 import Sidebar from './components/layout/Sidebar';
-import { TaskLauncher } from './components/TaskLauncher';
-import { AuthErrorToast } from './components/AuthErrorToast';
-import SettingsDialog from './components/layout/SettingsDialog';
-import { useTaskStore } from './stores/taskStore';
 import { Loader2, AlertTriangle } from 'lucide-react';
 
 type AppStatus = 'loading' | 'ready' | 'error';
@@ -25,42 +19,7 @@ type AppStatus = 'loading' | 'ready' | 'error';
 export default function App() {
   const [status, setStatus] = useState<AppStatus>('loading');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [authSettingsOpen, setAuthSettingsOpen] = useState(false);
-  const [authSettingsProvider, setAuthSettingsProvider] = useState<ProviderId | undefined>(undefined);
   const location = useLocation();
-
-  // Get store state and actions
-const { openLauncher, authError, clearAuthError } = useTaskStore();
-
-  // Handle re-login from auth error toast
-  const handleAuthReLogin = useCallback(() => {
-    if (authError) {
-      setAuthSettingsProvider(authError.providerId as ProviderId);
-      setAuthSettingsOpen(true);
-    }
-  }, [authError]);
-
-  // Handle auth settings dialog close
-  const handleAuthSettingsClose = useCallback((open: boolean) => {
-    setAuthSettingsOpen(open);
-    if (!open) {
-      setAuthSettingsProvider(undefined);
-      clearAuthError();
-    }
-  }, [clearAuthError]);
-
-  // Cmd+K keyboard shortcut
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        openLauncher();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [openLauncher]);
 
   useEffect(() => {
     const checkStatus = async () => {
@@ -132,21 +91,6 @@ const { openLauncher, authError, clearAuthError } = useTaskStore();
               }
             />
             <Route
-              path="/execution/:id"
-              element={
-                <motion.div
-                  className="h-full"
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  variants={variants.fadeUp}
-                  transition={springs.gentle}
-                >
-                  <ExecutionPage />
-                </motion.div>
-              }
-            />
-            <Route
               path="/chat/:id"
               element={
                 <motion.div
@@ -165,25 +109,6 @@ const { openLauncher, authError, clearAuthError } = useTaskStore();
           </Routes>
         </AnimatePresence>
       </main>
-      <TaskLauncher />
-
-      {/* Auth Error Toast - shown when OAuth session expires */}
-      <AuthErrorToast
-        error={authError}
-        onReLogin={handleAuthReLogin}
-        onDismiss={clearAuthError}
-      />
-
-      {/* Settings Dialog for re-authentication */}
-      <SettingsDialog
-        open={authSettingsOpen}
-        onOpenChange={handleAuthSettingsClose}
-        initialProvider={authSettingsProvider}
-        onApiKeySaved={() => {
-          clearAuthError();
-          setAuthSettingsOpen(false);
-        }}
-      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import TaskInputBar from '../components/landing/TaskInputBar';
@@ -11,43 +11,43 @@ import { ChevronDown } from 'lucide-react';
 import { getSiliconFlowConfig } from '@/services/siliconflow';
 import { useChatStore } from '@/stores/chatStore';
 
-// Education-focused use case examples (no images needed)
+// Education-focused use case examples — short/ambiguous to trigger AI clarification
 const EDU_USE_CASES = [
   {
     icon: '📝',
     title: '出题组卷',
-    description: '根据知识点和难度，智能生成练习题',
-    prompt: '请帮我生成5道高一数学函数性质的选择题，难度为中等，符合新高考要求，包含详细解答。',
+    description: '智能出题，AI会先了解您的需求',
+    prompt: '我想出一套练习题',
   },
   {
     icon: '📊',
     title: '课件大纲',
-    description: '自动生成教学PPT大纲和内容',
-    prompt: '请帮我制作一份高一数学"三角函数"新授课的PPT大纲，45分钟课时，包含导入、讲解、练习和总结环节。',
+    description: '生成PPT大纲，AI会确认细节',
+    prompt: '帮我做一个课件大纲',
   },
   {
     icon: '🔍',
     title: '试卷分析',
-    description: '分析学生成绩，找出薄弱知识点',
-    prompt: '请帮我分析本次月考数学成绩，班级平均分82分，最高98分最低43分。哪些知识点需要重点补习？给出教学建议。',
+    description: '分析成绩，找出薄弱环节',
+    prompt: '帮我分析一下最近的考试成绩',
   },
   {
     icon: '📋',
     title: '教案设计',
-    description: '生成完整的教学设计方案',
-    prompt: '请帮我设计一份高二数学"数列求和"的教案，要求包含教学目标、重难点、教学过程和板书设计。',
+    description: '生成教学设计方案',
+    prompt: '我需要写一份教案',
   },
   {
     icon: '✍️',
     title: '作业布置',
     description: '分层布置课后练习',
-    prompt: '请帮我布置课后作业，主题：二次函数。基础题3道、提高题2道、挑战题1道，适合高一学生。',
+    prompt: '帮我布置一下课后作业',
   },
   {
     icon: '💡',
     title: '解题指导',
-    description: '分析解题思路，总结方法技巧',
-    prompt: '请详细讲解这道高考真题的解题思路：已知函数f(x)=x³-3x+1，求函数在区间[-2,2]上的最大值和最小值。',
+    description: '分析解题思路和方法',
+    prompt: '有道题想请教一下解法',
   },
 ];
 
@@ -55,7 +55,7 @@ export default function HomePage() {
   const [prompt, setPrompt] = useState('');
   const [showExamples, setShowExamples] = useState(true);
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
-  const [settingsInitialTab, setSettingsInitialTab] = useState<'providers' | 'voice' | 'skills' | 'connectors' | 'teacher'>('teacher');
+  const [settingsInitialTab, setSettingsInitialTab] = useState<'teacher' | 'appearance' | 'about'>('teacher');
   const [isLoading, setIsLoading] = useState(false);
   const { createConversation } = useChatStore();
   const navigate = useNavigate();
@@ -90,16 +90,6 @@ export default function HomePage() {
       setSettingsInitialTab('teacher');
     }
   };
-
-  const handleOpenSpeechSettings = useCallback(() => {
-    setSettingsInitialTab('voice');
-    setShowSettingsDialog(true);
-  }, []);
-
-  const handleOpenModelSettings = useCallback(() => {
-    setSettingsInitialTab('teacher');
-    setShowSettingsDialog(true);
-  }, []);
 
   const handleApiKeySaved = async () => {
     setShowSettingsDialog(false);
@@ -142,7 +132,7 @@ export default function HomePage() {
             AI4Edu 智能教学助手
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            告诉我您的教学需求，让AI帮您完成
+            告诉我您的教学需求，我会先了解具体情况再为您服务
           </p>
         </motion.div>
 
@@ -160,16 +150,10 @@ export default function HomePage() {
                 onChange={setPrompt}
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
-                placeholder="描述您的教学需求，例如：帮我出5道函数题..."
+                placeholder="描述您的教学需求，例如：帮我出一套练习题..."
                 large={true}
                 autoFocus={true}
-                onOpenSpeechSettings={handleOpenSpeechSettings}
-                onOpenSettings={(tab) => {
-                  setSettingsInitialTab(tab);
-                  setShowSettingsDialog(true);
-                }}
-                onOpenModelSettings={handleOpenModelSettings}
-                hideModelWhenNoModel={true}
+                onOpenSettings={() => setShowSettingsDialog(true)}
               />
             </CardContent>
 

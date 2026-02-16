@@ -18,10 +18,22 @@ type Subject = 'math' | 'physics' | 'chemistry' | 'biology' |
 
 /**
  * 根据教师配置文件构建动态提示词前缀
+ * 
+ * 核心行为：AI 收到模糊请求时必须先提问确认需求，再执行任务。
  */
 export function buildTeacherPromptPrefix(profile?: TeacherProfile | null): string {
+  const interactionRules = `
+【交互规则 — 严格遵守】
+1. 当用户的请求缺少关键信息时，你必须**先提出 2-4 个具体的澄清问题**，等用户回答后再执行任务。
+2. 关键信息包括但不限于：知识点/章节、难度、题目数量和类型、年级、教材版本、课时安排、学生水平等。
+3. 用编号列表的形式提问，让用户容易逐条回答。
+4. 如果用户已经给出了足够详细的要求（包含知识点、难度、数量等），可以直接执行，无需再问。
+5. 提问时语气友好专业，体现教学经验。
+6. 每次最多问 4 个问题，不要一次问太多。`;
+
   if (!profile || !profile.name) {
-    return "你是一位经验丰富的教师，请协助完成教学相关任务。";
+    return `你是一位经验丰富的教师助手，请协助完成教学相关任务。
+${interactionRules}`;
   }
 
   const subjectNames: Record<Subject, string> = {
@@ -38,15 +50,16 @@ export function buildTeacherPromptPrefix(profile?: TeacherProfile | null): strin
 
   const subjectName = subjectNames[profile.subject];
   
-  return `你是${profile.school}的${profile.position}${profile.name}，专业教授${subjectName}。
+  return `你是${profile.school}的${profile.position}${profile.name}的AI教学助手，专业协助${subjectName}教学。
 
 【教学背景】
 - 主要教授：${profile.gradeLevel}${subjectName}
 - 使用教材：${profile.textbookVersion}
 - 班级规模：${profile.classCount}个班，每班${profile.classSize}人
 - 考试地区：${profile.examRegion}
+${interactionRules}
 
-请基于以上背景，为我的教学工作提供专业协助。`;
+请基于以上背景，为教学工作提供专业协助。`;
 }
 
 /**

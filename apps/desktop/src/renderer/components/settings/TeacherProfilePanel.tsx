@@ -52,7 +52,11 @@ const TEXTBOOK_VERSIONS = {
   politics: ['人教版', '粤教版']
 };
 
-export function TeacherProfilePanel() {
+interface TeacherProfilePanelProps {
+  onSaved?: () => void;
+}
+
+export function TeacherProfilePanel({ onSaved }: TeacherProfilePanelProps) {
   const [profile, setProfile] = useState<TeacherProfile>({
     name: '',
     school: '',
@@ -126,6 +130,7 @@ export function TeacherProfilePanel() {
       localStorage.setItem('ai4edu_api_model', apiModel);
       setProfile(updatedProfile);
       setHasUnsavedChanges(false);
+      onSaved?.();
     } catch (error) {
       console.error('Failed to save teacher profile:', error);
     } finally {
