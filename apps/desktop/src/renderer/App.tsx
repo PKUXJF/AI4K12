@@ -12,6 +12,7 @@ import ChatPage from './pages/Chat';
 
 // Components
 import Sidebar from './components/layout/Sidebar';
+import InitializationOverlay, { needsInitialization } from './components/onboarding/InitializationOverlay';
 import { Loader2, AlertTriangle } from 'lucide-react';
 
 type AppStatus = 'loading' | 'ready' | 'error';
@@ -19,6 +20,7 @@ type AppStatus = 'loading' | 'ready' | 'error';
 export default function App() {
   const [status, setStatus] = useState<AppStatus>('loading');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showInit, setShowInit] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -33,6 +35,10 @@ export default function App() {
         }
       } else {
         console.log('Running in browser mode — Accomplish IPC not available');
+      }
+      // 首次启动检测
+      if (needsInitialization()) {
+        setShowInit(true);
       }
       setStatus('ready');
     };
@@ -63,6 +69,19 @@ export default function App() {
           <p className="text-muted-foreground">{errorMessage}</p>
         </div>
       </div>
+    );
+  }
+
+  // 初始化覆盖层
+  if (showInit) {
+    return (
+      <InitializationOverlay
+        onComplete={() => {
+          setShowInit(false);
+          // 刷新 chatStore
+          window.location.reload();
+        }}
+      />
     );
   }
 

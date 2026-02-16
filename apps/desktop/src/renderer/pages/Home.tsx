@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import TaskInputBar from '../components/landing/TaskInputBar';
 import SettingsDialog from '../components/layout/SettingsDialog';
+import InitializationOverlay from '../components/onboarding/InitializationOverlay';
 import { springs, staggerContainer, staggerItem } from '../lib/animations';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronDown } from 'lucide-react';
@@ -57,6 +58,7 @@ export default function HomePage() {
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [settingsInitialTab, setSettingsInitialTab] = useState<'teacher' | 'appearance' | 'about'>('teacher');
   const [isLoading, setIsLoading] = useState(false);
+  const [showResetOverlay, setShowResetOverlay] = useState(false);
   const { createConversation } = useChatStore();
   const navigate = useNavigate();
 
@@ -110,11 +112,21 @@ export default function HomePage() {
 
   return (
     <>
+      {showResetOverlay && (
+        <InitializationOverlay
+          isReset
+          onComplete={() => {
+            setShowResetOverlay(false);
+            window.location.reload();
+          }}
+        />
+      )}
       <SettingsDialog
         open={showSettingsDialog}
         onOpenChange={handleSettingsDialogChange}
         onApiKeySaved={handleApiKeySaved}
         initialTab={settingsInitialTab}
+        onResetSystem={() => setShowResetOverlay(true)}
       />
       <div
         className="h-full flex items-center justify-center p-6 overflow-y-auto bg-accent"

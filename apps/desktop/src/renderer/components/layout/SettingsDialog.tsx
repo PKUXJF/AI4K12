@@ -8,12 +8,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { TeacherProfilePanel } from '@/components/settings/TeacherProfilePanel';
+import { ResetSystemButton } from '@/components/onboarding/InitializationOverlay';
 
 interface SettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onApiKeySaved?: () => void;
   initialTab?: 'teacher' | 'appearance' | 'about';
+  onResetSystem?: () => void;
 }
 
 export default function SettingsDialog({
@@ -21,6 +23,7 @@ export default function SettingsDialog({
   onOpenChange,
   onApiKeySaved,
   initialTab = 'teacher',
+  onResetSystem,
 }: SettingsDialogProps) {
   const [activeTab, setActiveTab] = useState<'teacher' | 'appearance' | 'about'>(initialTab);
   const [theme, setThemeState] = useState<string>(() => {
@@ -156,6 +159,22 @@ export default function SettingsDialog({
                     <div className="font-medium">1.0.0</div>
                   </div>
                 </div>
+              </div>
+
+              {/* 重置系统 */}
+              <div className="rounded-lg border border-border bg-card p-6">
+                <div className="mb-3">
+                  <div className="font-medium text-foreground">系统初始化</div>
+                  <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
+                    清除所有对话记录和配置，恢复默认设置并重新初始化系统。
+                  </p>
+                </div>
+                <ResetSystemButton
+                  onResetRequest={() => {
+                    onOpenChange(false);
+                    onResetSystem?.();
+                  }}
+                />
               </div>
             </div>
           )}
