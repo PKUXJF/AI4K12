@@ -1,0 +1,22 @@
+node_modules
+dist
+.DS_Store
+*.log
+vite.log
+tauri-dev.log
+
+# Local workflow metadata
+.sisyphus
+.spec-workflow
+
+# Tauri / Rust build outputs
+src-tauri/target
+
+# IDE and OS files
+.vscode
+Thumbs.db
+nul
+
+# Embedded Node runtime binaries (keep docs/scripts only)
+resources/nodejs/**/*.exe
+resources/nodejs/**/*.zip
