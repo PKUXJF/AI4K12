@@ -1,7 +1,7 @@
 // src/components/settings/APISettings.tsx
 import { useState } from 'react'
 import { Key, Eye, EyeOff, Save, TestTube, Server } from 'lucide-react'
-import { testKIMIConnection } from '../../services/kimiApi'
+import { testSiliconFlowConnection } from '../../services/aiApi'
 import { getTeacherProfile, saveTeacherProfile } from '../../services/teacherProfile'
 import type { Subject } from '../../types'
 
@@ -12,9 +12,9 @@ interface APISettingsProps {
 export function APISettings({ onClose }: APISettingsProps) {
   const teacherProfile = getTeacherProfile()
 
-  const [apiKey, setApiKey] = useState(localStorage.getItem('kimi_api_key') || '')
-  const [apiBase, setApiBase] = useState(localStorage.getItem('kimi_api_base') || '')
-  const [apiModel, setApiModel] = useState(localStorage.getItem('kimi_api_model') || 'Pro/moonshotai/Kimi-K2.5')
+  const [apiKey, setApiKey] = useState(localStorage.getItem('ai_api_key') || '')
+  const [apiBase, setApiBase] = useState(localStorage.getItem('ai_api_base') || '')
+  const [apiModel, setApiModel] = useState(localStorage.getItem('ai_api_model') || 'Pro/Qwen/Qwen2.5-72B-Instruct')
   const [teacherName, setTeacherName] = useState(teacherProfile?.name || '')
   const [school, setSchool] = useState(teacherProfile?.school || '')
   const [position, setPosition] = useState(teacherProfile?.position || '数学教师')
@@ -44,9 +44,9 @@ export function APISettings({ onClose }: APISettingsProps) {
       examRegion: examRegion.trim() || '新高考I卷',
     })
 
-    localStorage.setItem('kimi_api_key', apiKey)
-    localStorage.setItem('kimi_api_base', apiBase)
-    localStorage.setItem('kimi_api_model', apiModel)
+    localStorage.setItem('ai_api_key', apiKey)
+    localStorage.setItem('ai_api_base', apiBase)
+    localStorage.setItem('ai_api_model', apiModel)
     setTimeout(() => {
       setIsSaving(false)
       onClose?.()
@@ -63,7 +63,7 @@ export function APISettings({ onClose }: APISettingsProps) {
     setTestResult(null)
 
     // 使用Tauri后端测试连接（避免CORS问题）
-    const result = await testKIMIConnection(apiKey, apiBase)
+    const result = await testSiliconFlowConnection(apiKey, apiBase)
     setTestResult(result)
     setIsTesting(false)
   }
@@ -86,7 +86,7 @@ export function APISettings({ onClose }: APISettingsProps) {
               type={showKey ? 'text' : 'password'}
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              placeholder="请输入您的 KIMI API Key"
+              placeholder="请输入您的 SiliconFlow API Key"
               className="
                 w-full px-4 py-2 pr-10
                 border border-gray-300 dark:border-gray-600 rounded-lg
@@ -142,7 +142,7 @@ export function APISettings({ onClose }: APISettingsProps) {
             type="text"
             value={apiModel}
             onChange={(e) => setApiModel(e.target.value)}
-            placeholder="Pro/moonshotai/Kimi-K2.5"
+            placeholder="Pro/Qwen/Qwen2.5-72B-Instruct"
             className="
               w-full px-4 py-2
               border border-gray-300 dark:border-gray-600 rounded-lg

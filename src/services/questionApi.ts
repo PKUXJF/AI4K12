@@ -1,6 +1,6 @@
 // src/services/questionApi.ts
 import type { Question } from '../types'
-import { generateQuestionsWithKIMI } from './kimiApi'
+import { generateQuestionsWithAI } from './aiApi'
 
 export interface GenerateQuestionsOptions {
   topic: string
@@ -28,8 +28,7 @@ export async function generateQuestions(options: GenerateQuestionsOptions): Prom
       })
       
       const questions = await Promise.race([
-        generateQuestionsWithKIMI({ topic, difficulty, count }),
-        timeoutPromise
+          generateQuestionsWithAI({ topic, difficulty, count }),
       ])
       
       onProgress?.('complete', `成功生成 ${questions.length} 道题目`)
@@ -70,7 +69,7 @@ export async function generateQuestions(options: GenerateQuestionsOptions): Prom
 
 // 检查是否可以使用真实API
 export function canUseRealAPI(): boolean {
-  return !!localStorage.getItem('kimi_api_key')
+  return !!localStorage.getItem('ai_api_key')
 }
 
 function generateMockContent(topic: string, difficulty: string, index: number): string {
